@@ -19,8 +19,8 @@ set(ObjDir "${CMAKE_SOURCE_DIR}/bin-int/${CMAKE_BUILD_TYPE}-${SystemName}-${CMAK
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -flto -march=native -fno-rtti")
 
 # Set the directory containing your header files
-set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SOURCE_DIR "Ember/src")
+set(INCLUDE_DIR "Ember/src")
 
 # Recursively find source and header files
 file(GLOB_RECURSE SOURCE_FILES "${SOURCE_DIR}/*.cpp")
@@ -28,8 +28,6 @@ file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/*.h")
 
 # Create executable
 add_executable("${PROJECT_NAME}" ${SOURCE_FILES} ${HEADER_FILES})
-
-# Include directories
 
 # Set output directory
 set(TargetDir ${TargetDir}/${PROJECT_NAME})
@@ -41,7 +39,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # Add precompiled header
-#target_precompile_headers(${PROJECT_NAME} PRIVATE src/empch.h)
+#target_precompile_headers(${PROJECT_NAME} PRIVATE Ember/src/empch.h)
 
 # TODO: Platform specific macros
 # Build Configurations
@@ -83,10 +81,9 @@ else ()
     message(FATAL_ERROR "MoltenVK not found. Please set MOLTENVK_SDK to the MoltenVK installation directory.")
 endif ()
 
-add_subdirectory(vendor/glfw)
-add_subdirectory(vendor/spdlog)
+add_subdirectory(Ember/vendor/glfw)
+add_subdirectory(Ember/vendor/spdlog)
 #add_subdirectory(vendor/imgui)
-#add_subdirectory(vendor/glad)
 
 # Set output directory for libraries
 set_target_properties(glfw PROPERTIES
@@ -107,8 +104,8 @@ set_target_properties(spdlog PROPERTIES
 #        PRIVATE vendor/imgui)
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${Vulkan_INCLUDE_DIRS}
-        PRIVATE vendor/glfw/include
-        PRIVATE vendor/spdlog/include)
+        PRIVATE Ember/vendor/glfw/include
+        PRIVATE Ember/vendor/spdlog/include)
 
 #target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui glad)
 target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog)
