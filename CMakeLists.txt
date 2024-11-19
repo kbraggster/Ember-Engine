@@ -18,8 +18,6 @@ set(ObjDir "${CMAKE_SOURCE_DIR}/bin-int/${CMAKE_BUILD_TYPE}-${SystemName}-${CMAK
 # -fno-exceptions can be added as argument to strip exceptions
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -flto -march=native -fno-rtti")
 
-# Add subdirectories
-
 # Set the directory containing your header files
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -85,22 +83,19 @@ else ()
     message(FATAL_ERROR "MoltenVK not found. Please set MOLTENVK_SDK to the MoltenVK installation directory.")
 endif ()
 
-#add_subdirectory(vendor/glfw)
+add_subdirectory(vendor/glfw)
 #add_subdirectory(vendor/spdlog)
 #add_subdirectory(vendor/imgui)
 #add_subdirectory(vendor/glad)
 
 # Set output directory for libraries
-#set_target_properties(imgui PROPERTIES
-#        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
-#        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
-#set_target_properties(glfw PROPERTIES
-#        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
-#        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
+set_target_properties(glfw PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
+        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
 #set_target_properties(spdlog PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
 #        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
-#set_target_properties(glad PROPERTIES
+#set_target_properties(imgui PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
 #        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
 
@@ -109,7 +104,7 @@ endif ()
 #        PRIVATE ${Vulkan_INCLUDE_DIRS}
 #        PRIVATE vendor/glfw/include
 #        PRIVATE vendor/spdlog/include
-#        PRIVATE vendor/imgui
-#        PRIVATE vendor/glad)
+#        PRIVATE vendor/imgui)
 
 #target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui glad)
+target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
