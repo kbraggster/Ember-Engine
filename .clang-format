@@ -1,0 +1,7 @@
+Language: Cpp
+BasedOnStyle: Microsoft
+SortIncludes: Never
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: InlineOnly
+AlignConsecutiveAssignments: true
+IndentCaseLabels: true
