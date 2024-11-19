@@ -84,7 +84,7 @@ else ()
 endif ()
 
 add_subdirectory(vendor/glfw)
-#add_subdirectory(vendor/spdlog)
+add_subdirectory(vendor/spdlog)
 #add_subdirectory(vendor/imgui)
 #add_subdirectory(vendor/glad)
 
@@ -92,9 +92,9 @@ add_subdirectory(vendor/glfw)
 set_target_properties(glfw PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
         LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
-#set_target_properties(spdlog PROPERTIES
-#        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
-#        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
+set_target_properties(spdlog PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
+        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
 #set_target_properties(imgui PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
 #        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
@@ -105,6 +105,10 @@ set_target_properties(glfw PROPERTIES
 #        PRIVATE vendor/glfw/include
 #        PRIVATE vendor/spdlog/include
 #        PRIVATE vendor/imgui)
+target_include_directories(${PROJECT_NAME}
+        PRIVATE ${Vulkan_INCLUDE_DIRS}
+        PRIVATE vendor/glfw/include
+        PRIVATE vendor/spdlog/include)
 
 #target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui glad)
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw)
+target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog)
