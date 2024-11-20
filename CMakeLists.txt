@@ -39,7 +39,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 # Add precompiled header
-#target_precompile_headers(${PROJECT_NAME} PRIVATE Ember/src/empch.h)
+target_precompile_headers(${PROJECT_NAME} PRIVATE Ember/src/empch.h)
 
 # TODO: Platform specific macros
 # Build Configurations
