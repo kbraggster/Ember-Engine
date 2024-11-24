@@ -103,6 +103,7 @@ set_target_properties(spdlog PROPERTIES
 #        PRIVATE vendor/spdlog/include
 #        PRIVATE vendor/imgui)
 target_include_directories(${PROJECT_NAME}
+        PRIVATE ${SOURCE_DIR}
         PRIVATE ${Vulkan_INCLUDE_DIRS}
         PRIVATE Ember/vendor/glfw/include
         PRIVATE Ember/vendor/spdlog/include)
