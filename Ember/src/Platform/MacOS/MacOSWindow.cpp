@@ -78,7 +78,6 @@ void MacOSWindow::OnUpdate()
 
 void MacOSWindow::SetVSync(const bool enabled)
 {
-
     m_Data.VSync = enabled;
 }
 

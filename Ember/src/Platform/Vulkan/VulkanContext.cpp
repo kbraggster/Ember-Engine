@@ -1,12 +1,13 @@
 #include "VulkanContext.h"
 
-VulkanContext::VulkanContext(const GLFWwindow* windowHandle) : m_WindowHandle(windowHandle)
+VulkanContext::VulkanContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHandle)
 {
     EM_ASSERT(windowHandle, "Window handle is null");
 }
 
 VulkanContext::~VulkanContext()
 {
+    vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
     m_DebugUtils.DestroyDebugUtils(m_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
     vkDestroyInstance(m_Instance, nullptr);
 }
@@ -17,6 +18,8 @@ void VulkanContext::Init()
     EM_CORE_INFO("Vulkan instance created");
 
     m_DebugUtils.SetupDebugUtils(m_Instance);
+
+    CreateSurface(m_WindowHandle);
 }
 
 VkInstance VulkanContext::CreateInstance()
@@ -41,9 +44,9 @@ VkInstance VulkanContext::CreateInstance()
     const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-    extensions.push_back("VK_MVK_macos_surface");
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    extensions.push_back("VK_MVK_macos_surface");
 
     createInfo.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
@@ -59,4 +62,10 @@ VkInstance VulkanContext::CreateInstance()
     EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create Vulkan instance!");
 
     return instance;
+}
+
+void VulkanContext::CreateSurface(GLFWwindow* windowHandle)
+{
+    if (glfwCreateWindowSurface(m_Instance, windowHandle, nullptr, &m_Surface))
+        EM_CORE_ERROR("Error creating window surface!");
 }

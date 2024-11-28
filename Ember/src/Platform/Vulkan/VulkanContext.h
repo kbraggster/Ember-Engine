@@ -10,17 +10,19 @@
 class VulkanContext : public GraphicsContext
 {
   public:
-    explicit VulkanContext(const GLFWwindow* windowHandle);
+    explicit VulkanContext(GLFWwindow* windowHandle);
     ~VulkanContext() override;
 
     void Init() override;
 
   private:
     VkInstance CreateInstance();
+    void CreateSurface(GLFWwindow* windowHandle);
 
   private:
-    const GLFWwindow* m_WindowHandle;
+    GLFWwindow* m_WindowHandle;
 
     VkInstance m_Instance;
     VulkanDebugUtils m_DebugUtils;
+    VkSurfaceKHR m_Surface;
 };
