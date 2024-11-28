@@ -7,6 +7,7 @@ VulkanContext::VulkanContext(const GLFWwindow* windowHandle) : m_WindowHandle(wi
 
 VulkanContext::~VulkanContext()
 {
+    m_DebugUtils.DestroyDebugUtils(m_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
     vkDestroyInstance(m_Instance, nullptr);
 }
 
@@ -14,6 +15,8 @@ void VulkanContext::Init()
 {
     m_Instance = CreateInstance();
     EM_CORE_INFO("Vulkan instance created");
+
+    m_DebugUtils.SetupDebugUtils(m_Instance);
 }
 
 VkInstance VulkanContext::CreateInstance()
@@ -39,12 +42,17 @@ VkInstance VulkanContext::CreateInstance()
 
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
     extensions.push_back("VK_MVK_macos_surface");
+    extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 
     createInfo.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
-    createInfo.enabledLayerCount = 0;
+    std::vector<const char*> layers;
+    layers.push_back("VK_LAYER_KHRONOS_validation");
+
+    createInfo.enabledLayerCount   = layers.size();
+    createInfo.ppEnabledLayerNames = layers.data();
 
     VkInstance instance;
     const VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);

@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Engine/Renderer/GraphicsContext.h"
+#include "Platform/Vulkan/VulkanDebugUtils.h"
 
 class VulkanContext : public GraphicsContext
 {
@@ -14,10 +15,12 @@ class VulkanContext : public GraphicsContext
 
     void Init() override;
 
+  private:
     VkInstance CreateInstance();
 
   private:
     const GLFWwindow* m_WindowHandle;
 
     VkInstance m_Instance;
+    VulkanDebugUtils m_DebugUtils;
 };
