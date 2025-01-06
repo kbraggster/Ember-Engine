@@ -4,7 +4,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBits
                                              VkDebugUtilsMessageTypeFlagsEXT messageType,
                                              const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData)
 {
-    EM_CORE_ERROR("VULKAN: {0}", callbackData->pMessage);
+    EM_CORE_ERROR("Vulkan {0}", callbackData->pMessage);
     return VK_FALSE;
 }
 

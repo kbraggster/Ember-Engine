@@ -5,7 +5,9 @@
 #include <GLFW/glfw3.h>
 
 #include "Engine/Renderer/GraphicsContext.h"
+
 #include "Platform/Vulkan/VulkanDebugUtils.h"
+#include "Platform/Vulkan/VulkanDevice.h"
 
 class VulkanContext : public GraphicsContext
 {
@@ -23,6 +25,7 @@ class VulkanContext : public GraphicsContext
     GLFWwindow* m_WindowHandle;
 
     VkInstance m_Instance;
-    VulkanDebugUtils m_DebugUtils;
     VkSurfaceKHR m_Surface;
+    VulkanDebugUtils m_DebugUtils;
+    std::unique_ptr<VulkanDevice> m_Device;
 };
