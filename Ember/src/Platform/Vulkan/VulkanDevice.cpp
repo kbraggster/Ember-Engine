@@ -33,6 +33,21 @@ void VulkanDevice::PickPhysicalDevice()
     }
 
     EM_CORE_ASSERT(m_PhysicalDevice != VK_NULL_HANDLE, "Failed to find a suitable GPU!");
+
+    // Query and log physical device details
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(m_PhysicalDevice, &deviceFeatures);
+
+    EM_CORE_INFO("Vulkan Info:");
+    EM_CORE_INFO("  API Version: {0}.{1}.{2}", VK_VERSION_MAJOR(deviceProperties.apiVersion),
+                 VK_VERSION_MINOR(deviceProperties.apiVersion), VK_VERSION_PATCH(deviceProperties.apiVersion));
+    EM_CORE_INFO("  Device Vendor: {0}", GetVendorName(deviceProperties));
+    EM_CORE_INFO("  Device Name: {0}", deviceProperties.deviceName);
+    EM_CORE_INFO("  Device Type: {0}", DeviceTypeToString(deviceProperties.deviceType));
+    EM_CORE_INFO("  Driver Version: {0}", deviceProperties.driverVersion);
 }
 
 void VulkanDevice::CreateLogicalDevice()
@@ -136,4 +151,40 @@ QueueFamilyIndices VulkanDevice::FindQueueFamilies(VkPhysicalDevice device)
     }
 
     return indices;
+}
+
+std::string VulkanDevice::DeviceTypeToString(VkPhysicalDeviceType type)
+{
+    switch (type)
+    {
+        case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+            return "Integrated GPU";
+        case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+            return "Discrete GPU";
+        case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+            return "Virtual GPU";
+        case VK_PHYSICAL_DEVICE_TYPE_CPU:
+            return "CPU";
+        case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+            return "Other";
+        default:
+            return "Unknown";
+    }
+}
+
+std::string VulkanDevice::GetVendorName(const VkPhysicalDeviceProperties& props)
+{
+    switch (props.vendorID)
+    {
+        case 0x1022:
+            return "AMD";
+        case 0x10DE:
+            return "NVIDIA";
+        case 0x8086:
+            return "Intel";
+        case 0x106B:
+            return "Apple";
+        default:
+            return "Unknown Vendor";
+    }
 }

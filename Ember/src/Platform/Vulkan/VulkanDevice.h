@@ -17,10 +17,10 @@ class VulkanDevice
     VulkanDevice(VkInstance& instance, VkSurfaceKHR& surface);
     ~VulkanDevice();
 
-    // VkDevice GetDevice() const { return m_Device; }
-    // VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
-    // VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
-    // VkQueue GetPresentQueue() const { return m_PresentQueue; }
+    VkDevice GetDevice() const { return m_Device; }
+    VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
+    VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+    VkQueue GetPresentQueue() const { return m_PresentQueue; }
 
   private:
     void PickPhysicalDevice();
@@ -29,6 +29,9 @@ class VulkanDevice
     bool IsDeviceSuitable(VkPhysicalDevice device);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(m_PhysicalDevice); }
+
+    std::string DeviceTypeToString(VkPhysicalDeviceType type);
+    std::string GetVendorName(const VkPhysicalDeviceProperties& props);
 
   private:
     VkInstance m_Instance;
