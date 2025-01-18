@@ -8,6 +8,7 @@
 
 #include "Platform/Vulkan/VulkanDebugUtils.h"
 #include "Platform/Vulkan/VulkanDevice.h"
+#include "Platform/Vulkan/VulkanSwapchain.h"
 
 class VulkanContext : public GraphicsContext
 {
@@ -27,5 +28,6 @@ class VulkanContext : public GraphicsContext
     VkInstance m_Instance;
     VkSurfaceKHR m_Surface;
     VulkanDebugUtils m_DebugUtils;
-    std::unique_ptr<VulkanDevice> m_Device;
+    Ref<VulkanDevice> m_Device;
+    Ref<VulkanSwapchain> m_Swapchain;
 };

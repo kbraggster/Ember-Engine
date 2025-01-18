@@ -6,7 +6,7 @@ Application::Application()
 {
     s_Instance = this;
 
-    m_Window = std::unique_ptr<Window>(Window::Create());
+    m_Window.reset(Window::Create());
 }
 
 void Application::Run()

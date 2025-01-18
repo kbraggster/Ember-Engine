@@ -9,8 +9,17 @@ VulkanDevice::VulkanDevice(VkInstance& instance, VkSurfaceKHR& surface) : m_Inst
 
 VulkanDevice::~VulkanDevice()
 {
-    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
-    vkDestroyDevice(m_Device, nullptr);
+    if (m_Device != VK_NULL_HANDLE)
+    {
+        if (m_CommandPool != VK_NULL_HANDLE)
+        {
+            vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+            m_CommandPool = VK_NULL_HANDLE;
+        }
+
+        vkDestroyDevice(m_Device, nullptr);
+        m_Device = VK_NULL_HANDLE;
+    }
 }
 
 void VulkanDevice::PickPhysicalDevice()
@@ -27,7 +36,8 @@ void VulkanDevice::PickPhysicalDevice()
     {
         if (IsDeviceSuitable(device))
         {
-            m_PhysicalDevice = device;
+            m_PhysicalDevice     = device;
+            m_QueueFamilyIndices = FindQueueFamilies(device);
             break;
         }
     }
@@ -100,8 +110,8 @@ void VulkanDevice::CreateCommandPool()
     createInfo.queueFamilyIndex        = indices.GraphicsFamily;
     createInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-    EM_CORE_ASSERT(vkCreateCommandPool(m_Device, &createInfo, nullptr, &m_CommandPool) == VK_SUCCESS,
-                   "Failed to create command pool!");
+    VkResult result = vkCreateCommandPool(m_Device, &createInfo, nullptr, &m_CommandPool);
+    EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create command pool!");
 }
 
 bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device)

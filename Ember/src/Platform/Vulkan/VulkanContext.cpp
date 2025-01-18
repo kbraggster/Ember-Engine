@@ -7,10 +7,18 @@ VulkanContext::VulkanContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHa
 
 VulkanContext::~VulkanContext()
 {
-    m_Device.reset();
-    vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+    m_Swapchain.reset();
+    if (m_Surface != VK_NULL_HANDLE)
+    {
+        vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+        m_Surface = VK_NULL_HANDLE;
+    }
     m_DebugUtils.DestroyDebugUtils(m_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
-    vkDestroyInstance(m_Instance, nullptr);
+    if (m_Instance != VK_NULL_HANDLE)
+    {
+        vkDestroyInstance(m_Instance, nullptr);
+        m_Instance = VK_NULL_HANDLE;
+    }
 }
 
 void VulkanContext::Init()
@@ -22,7 +30,10 @@ void VulkanContext::Init()
 
     CreateSurface(m_WindowHandle);
 
-    m_Device = std::make_unique<VulkanDevice>(m_Instance, m_Surface);
+    m_Device.reset(new VulkanDevice(m_Instance, m_Surface));
+
+    m_Swapchain.reset(new VulkanSwapchain(*m_Device, m_Surface));
+    m_Swapchain->CreateSwapchain(2560, 1440);
 }
 
 VkInstance VulkanContext::CreateInstance()

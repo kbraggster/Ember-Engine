@@ -21,6 +21,7 @@ class VulkanDevice
     VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
     VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
     VkQueue GetPresentQueue() const { return m_PresentQueue; }
+    QueueFamilyIndices GetQueueFamilyIndices() const { return m_QueueFamilyIndices; }
 
   private:
     void PickPhysicalDevice();
@@ -42,4 +43,5 @@ class VulkanDevice
     VkCommandPool m_CommandPool;
     VkQueue m_GraphicsQueue;
     VkQueue m_PresentQueue;
+    QueueFamilyIndices m_QueueFamilyIndices;
 };
