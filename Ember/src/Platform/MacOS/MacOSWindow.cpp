@@ -1,7 +1,5 @@
 #include "MacOSWindow.h"
 
-#include "Platform/Vulkan/VulkanContext.h"
-
 static bool s_GLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
@@ -62,8 +60,8 @@ void MacOSWindow::Init(const WindowProps& props)
         WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
     });
 
-    VulkanContext context = VulkanContext(m_Window);
-    context.Init();
+    m_Context.reset(new VulkanContext(m_Window));
+    m_Context->Init();
 }
 
 void MacOSWindow::Shutdown()
