@@ -98,7 +98,7 @@ void VulkanDevice::CreateLogicalDevice()
     vkGetDeviceQueue(m_Device, indices.GraphicsFamily, 0, &m_GraphicsQueue);
     vkGetDeviceQueue(m_Device, indices.PresentFamily, 0, &m_PresentQueue);
 
-    EM_CORE_INFO("Logical device created!");
+    EM_CORE_INFO("Logical device created");
 }
 
 void VulkanDevice::CreateCommandPool()

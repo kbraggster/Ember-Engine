@@ -13,9 +13,27 @@ void Application::Run()
 {
     while (m_Running)
     {
-        // EM_CORE_TRACE("{0}", m_Running);
+        for (Layer* layer : m_LayerStack)
+            layer->OnUpdate();
+
+        // m_ImGuiLayer->Begin();
+        // for (Layer* layer : m_LayerStack)
+        //     layer->OnImGuiRender();
+        // m_ImGuiLayer->End();
+
         m_Window->OnUpdate();
     }
+}
+
+void Application::PushLayer(Layer* layer)
+{
+    m_LayerStack.PushLayer(layer);
+    layer->OnAttach();
+}
+
+void Application::PushOverlay(Layer* layer)
+{
+    m_LayerStack.PushOverlay(layer);
 }
 
 Application* CreateApplication()

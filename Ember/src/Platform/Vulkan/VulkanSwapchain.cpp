@@ -58,7 +58,7 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
     VkResult result = vkCreateSwapchainKHR(m_Device.GetDevice(), &createInfo, nullptr, &m_Swapchain);
     EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create swapchain!");
 
-    EM_CORE_INFO("Swapchain created!");
+    EM_CORE_INFO("Swapchain created");
 
     // Retrieve swapchain images
     vkGetSwapchainImagesKHR(m_Device.GetDevice(), m_Swapchain, &imageCount, nullptr);
