@@ -83,7 +83,7 @@ endif ()
 
 add_subdirectory(Ember/vendor/glfw)
 add_subdirectory(Ember/vendor/spdlog)
-#add_subdirectory(vendor/imgui)
+add_subdirectory(Ember/vendor/imgui)
 
 # Set output directory for libraries
 set_target_properties(glfw PROPERTIES
@@ -92,21 +92,16 @@ set_target_properties(glfw PROPERTIES
 set_target_properties(spdlog PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
         LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
-#set_target_properties(imgui PROPERTIES
-#        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
-#        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
+set_target_properties(imgui PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${ObjDir}
+        LIBRARY_OUTPUT_DIRECTORY ${ObjDir})
 
 # Include and link libraries
-#target_include_directories(${PROJECT_NAME}
-#        PRIVATE ${Vulkan_INCLUDE_DIRS}
-#        PRIVATE vendor/glfw/include
-#        PRIVATE vendor/spdlog/include
-#        PRIVATE vendor/imgui)
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${SOURCE_DIR}
         PRIVATE ${Vulkan_INCLUDE_DIRS}
         PRIVATE Ember/vendor/glfw/include
-        PRIVATE Ember/vendor/spdlog/include)
+        PRIVATE Ember/vendor/spdlog/include
+        PRIVATE Ember/vendor/imgui)
 
-#target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui glad)
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog)
+target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui)
