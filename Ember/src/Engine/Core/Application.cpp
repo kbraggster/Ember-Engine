@@ -7,6 +7,9 @@ Application::Application()
     s_Instance = this;
 
     m_Window.reset(Window::Create());
+
+    m_ImGuiLayer = new ImGuiLayer(*m_Window);
+    PushOverlay(m_ImGuiLayer);
 }
 
 void Application::Run()
@@ -16,10 +19,10 @@ void Application::Run()
         for (Layer* layer : m_LayerStack)
             layer->OnUpdate();
 
-        // m_ImGuiLayer->Begin();
-        // for (Layer* layer : m_LayerStack)
-        //     layer->OnImGuiRender();
-        // m_ImGuiLayer->End();
+        m_ImGuiLayer->Begin();
+        for (Layer* layer : m_LayerStack)
+            layer->OnImGuiRender();
+        m_ImGuiLayer->End();
 
         m_Window->OnUpdate();
     }
@@ -34,6 +37,7 @@ void Application::PushLayer(Layer* layer)
 void Application::PushOverlay(Layer* layer)
 {
     m_LayerStack.PushOverlay(layer);
+    layer->OnAttach();
 }
 
 Application* CreateApplication()
