@@ -1,10 +1,10 @@
-[submodule "vendor/glfw"]
-	path = vendor/glfw
-	url = https://github.com/glfw/glfw.git
-[submodule "vendor/spdlog"]
-	path = vendor/spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "Ember/vendor/imgui"]
 	path = Ember/vendor/imgui
 	url = https://github.com/kbraggster/imgui.git
 	branch = docking
+[submodule "Ember/vendor/glfw"]
+	path = Ember/vendor/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Ember/vendor/spdlog"]
+	path = Ember/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
