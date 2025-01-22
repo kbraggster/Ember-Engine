@@ -8,6 +8,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable("${PROJECT_NAME}" ${SOURCES})
 
+# Set executable name
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "EmberEngine")
 
 # Set output directory
