@@ -9,6 +9,9 @@
 
 int main(int argc, char** argv);
 
+namespace Ember
+{
+
 class Application
 {
   public:
@@ -36,3 +39,5 @@ class Application
 
 // To be defined in CLIENT
 Application* CreateApplication();
+
+} // namespace Ember

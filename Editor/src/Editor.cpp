@@ -1,6 +1,9 @@
 #include <Ember.h>
 #include <Engine/Core/EntryPoint.h>
 
+namespace Ember
+{
+
 class ExampleLayer final : public Layer
 {
   public:
@@ -23,3 +26,5 @@ Application* CreateApplication()
 {
     return new Editor();
 }
+
+} // namespace Ember

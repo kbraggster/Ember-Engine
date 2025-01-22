@@ -2,6 +2,9 @@
 
 #include "vulkan/vulkan.h"
 
+namespace Ember
+{
+
 struct QueueFamilyIndices
 {
     uint32_t GraphicsFamily;
@@ -45,3 +48,5 @@ class VulkanDevice
     VkQueue m_PresentQueue;
     QueueFamilyIndices m_QueueFamilyIndices;
 };
+
+} // namespace Ember

@@ -1,5 +1,8 @@
 #include "VulkanContext.h"
 
+namespace Ember
+{
+
 VulkanContext::VulkanContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHandle)
 {
     EM_ASSERT(windowHandle, "Window handle is null");
@@ -84,3 +87,5 @@ void VulkanContext::CreateSurface(GLFWwindow* windowHandle)
     if (glfwCreateWindowSurface(m_Instance, windowHandle, nullptr, &m_Surface))
         EM_CORE_ERROR("Error creating window surface!");
 }
+
+} // namespace Ember

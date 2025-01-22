@@ -1,5 +1,7 @@
 #include "Application.h"
 
+namespace Ember
+{
 Application* Application::s_Instance = nullptr;
 
 Application::Application()
@@ -39,3 +41,5 @@ void Application::PushOverlay(Layer* layer)
     m_LayerStack.PushOverlay(layer);
     layer->OnAttach();
 }
+
+} // namespace Ember

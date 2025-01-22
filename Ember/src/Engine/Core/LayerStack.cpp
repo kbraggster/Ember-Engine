@@ -1,5 +1,8 @@
 #include "LayerStack.h"
 
+namespace Ember
+{
+
 LayerStack::~LayerStack()
 {
     for (const Layer* layer : m_Layers)
@@ -33,3 +36,5 @@ void LayerStack::PopOverlay(Layer* layer)
     if (it != m_Layers.end())
         m_Layers.erase(it);
 }
+
+} // namespace Ember

@@ -5,6 +5,9 @@
 
 #include <Platform/Vulkan/VulkanContext.h>
 
+namespace Ember
+{
+
 class ImGuiLayer : public Layer
 {
   public:
@@ -22,3 +25,5 @@ class ImGuiLayer : public Layer
     Ref<VulkanContext> m_Context;
     float m_Time = 0.0f;
 };
+
+} // namespace Ember

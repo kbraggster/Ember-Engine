@@ -6,6 +6,9 @@
 
 #include <GLFW/glfw3.h>
 
+namespace Ember
+{
+
 class MacOSWindow : public Window
 {
   public:
@@ -39,3 +42,5 @@ class MacOSWindow : public Window
 
     WindowData m_Data;
 };
+
+} // namespace Ember

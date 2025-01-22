@@ -2,6 +2,9 @@
 #include <string>
 #include <Engine/Renderer/GraphicsContext.h>
 
+namespace Ember
+{
+
 struct WindowProps
 {
     std::string Title;
@@ -39,3 +42,5 @@ class Window
 
     static Window* Create(const WindowProps& props = WindowProps());
 };
+
+} // namespace Ember

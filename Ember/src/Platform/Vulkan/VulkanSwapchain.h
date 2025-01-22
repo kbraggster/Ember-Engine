@@ -4,6 +4,9 @@
 
 #include <vulkan/vulkan.h>
 
+namespace Ember
+{
+
 class VulkanSwapchain
 {
   public:
@@ -35,3 +38,5 @@ class VulkanSwapchain
     VkFormat m_SwapchainImageFormat;
     VkExtent2D m_SwapchainExtent;
 };
+
+} // namespace Ember

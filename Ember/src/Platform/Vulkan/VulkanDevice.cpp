@@ -1,5 +1,8 @@
 #include "VulkanDevice.h"
 
+namespace Ember
+{
+
 VulkanDevice::VulkanDevice(VkInstance& instance, VkSurfaceKHR& surface) : m_Instance(instance), m_Surface(surface)
 {
     PickPhysicalDevice();
@@ -198,3 +201,5 @@ std::string VulkanDevice::GetVendorName(const VkPhysicalDeviceProperties& props)
             return "Unknown Vendor";
     }
 }
+
+} // namespace Ember

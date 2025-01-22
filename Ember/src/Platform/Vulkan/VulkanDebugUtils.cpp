@@ -1,5 +1,8 @@
 #include "VulkanDebugUtils.h"
 
+namespace Ember
+{
+
 VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                              VkDebugUtilsMessageTypeFlagsEXT messageType,
                                              const VkDebugUtilsMessengerCallbackDataEXT* callbackData, void* userData)
@@ -49,3 +52,5 @@ void VulkanDebugUtils::DestroyDebugUtils(VkInstance& instance, VkDebugUtilsMesse
     if (func != nullptr)
         func(instance, messenger, allocator);
 }
+
+} // namespace Ember

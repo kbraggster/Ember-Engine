@@ -1,5 +1,8 @@
 #include "VulkanSwapchain.h"
 
+namespace Ember
+{
+
 VulkanSwapchain::VulkanSwapchain(const VulkanDevice& device, const VkSurfaceKHR& surface)
     : m_Device(device), m_Surface(surface)
 {
@@ -159,3 +162,5 @@ VkExtent2D VulkanSwapchain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& cap
         std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
     return actualExtent;
 }
+
+} // namespace Ember

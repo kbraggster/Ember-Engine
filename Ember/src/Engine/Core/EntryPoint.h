@@ -3,15 +3,14 @@
 #include "Base.h"
 #include "Application.h"
 
-extern Application* CreateApplication();
+extern Ember::Application* Ember::CreateApplication();
 
 int main(int argc, char** argv)
 {
-
-    Log::Init();
+    Ember::Log::Init();
     EM_CORE_INFO("Initialized Log");
 
-    const auto app = CreateApplication();
+    const auto app = Ember::CreateApplication();
     app->Run();
     delete app;
 }

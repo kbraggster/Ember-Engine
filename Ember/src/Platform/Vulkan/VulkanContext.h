@@ -11,6 +11,9 @@
 #include "Platform/Vulkan/VulkanDevice.h"
 #include "Platform/Vulkan/VulkanSwapchain.h"
 
+namespace Ember
+{
+
 class VulkanContext : public GraphicsContext
 {
   public:
@@ -32,3 +35,5 @@ class VulkanContext : public GraphicsContext
     Ref<VulkanDevice> m_Device;
     Ref<VulkanSwapchain> m_Swapchain;
 };
+
+} // namespace Ember

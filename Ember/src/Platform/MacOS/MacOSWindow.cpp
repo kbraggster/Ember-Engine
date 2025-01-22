@@ -1,5 +1,8 @@
 #include "MacOSWindow.h"
 
+namespace Ember
+{
+
 static bool s_GLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
@@ -83,3 +86,5 @@ bool MacOSWindow::IsVSync() const
 {
     return m_Data.VSync;
 }
+
+} // namespace Ember

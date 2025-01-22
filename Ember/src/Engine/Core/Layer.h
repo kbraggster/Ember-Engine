@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Ember
+{
+
 class Layer
 {
   public:
@@ -16,3 +19,5 @@ class Layer
   private:
     std::string m_DebugName;
 };
+
+} // namespace Ember

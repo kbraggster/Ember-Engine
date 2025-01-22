@@ -2,6 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
+namespace Ember
+{
+
 class VulkanDebugUtils
 {
   public:
@@ -21,3 +24,5 @@ class VulkanDebugUtils
   private:
     VkDebugUtilsMessengerEXT m_DebugMessenger;
 };
+
+} // namespace Ember

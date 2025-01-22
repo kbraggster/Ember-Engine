@@ -11,6 +11,9 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
+namespace Ember
+{
+
 ImGuiLayer::ImGuiLayer(const Window& window)
     : Layer("ImGuiLayer") //, m_Context(std::static_pointer_cast<VulkanContext>(window.GetContext()))
 {
@@ -109,3 +112,5 @@ void ImGuiLayer::OnImGuiRender()
     static bool show = true;
     ImGui::ShowDemoWindow(&show);
 }
+
+} // namespace Ember
