@@ -1,6 +1,8 @@
 #pragma once
 #include "Layer.h"
 
+#include <vector>
+
 class LayerStack
 {
   public:

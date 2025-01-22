@@ -7,6 +7,8 @@
 #include "Engine/ImGui/ImGuiLayer.h"
 #include "Platform/Vulkan/VulkanContext.h"
 
+int main(int argc, char** argv);
+
 class Application
 {
   public:
@@ -32,4 +34,5 @@ class Application
     static Application* s_Instance;
 };
 
+// To be defined in CLIENT
 Application* CreateApplication();

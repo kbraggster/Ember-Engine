@@ -1,7 +1,13 @@
+#pragma once
+
+#include "Base.h"
 #include "Application.h"
 
-int main()
+extern Application* CreateApplication();
+
+int main(int argc, char** argv)
 {
+
     Log::Init();
     EM_CORE_INFO("Initialized Log");
 

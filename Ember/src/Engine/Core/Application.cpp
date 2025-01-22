@@ -39,8 +39,3 @@ void Application::PushOverlay(Layer* layer)
     m_LayerStack.PushOverlay(layer);
     layer->OnAttach();
 }
-
-Application* CreateApplication()
-{
-    return new Application();
-}
