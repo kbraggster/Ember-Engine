@@ -12,18 +12,18 @@ VulkanSwapchain::~VulkanSwapchain()
 {
     for (auto imageView : m_SwapchainImageViews)
     {
-        vkDestroyImageView(m_Device.GetDevice(), imageView, nullptr);
+        vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
     }
     m_SwapchainImageViews.clear();
 
-    vkDestroySwapchainKHR(m_Device.GetDevice(), m_Swapchain, nullptr);
+    vkDestroySwapchainKHR(m_Device.GetVkDevice(), m_Swapchain, nullptr);
     m_Swapchain = VK_NULL_HANDLE;
 }
 
 void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
 {
     // Query swapchain support details
-    SwapchainSupportDetails details = QuerySwapchainSupport(m_Device.GetPhysicalDevice(), m_Surface);
+    SwapchainSupportDetails details = QuerySwapchainSupport(m_Device.GetVkPhysicalDevice(), m_Surface);
 
     // Choose swapchain settings
     VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(details.Formats);
@@ -58,15 +58,15 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
     createInfo.clipped                = VK_TRUE;
     createInfo.oldSwapchain           = VK_NULL_HANDLE;
 
-    VkResult result = vkCreateSwapchainKHR(m_Device.GetDevice(), &createInfo, nullptr, &m_Swapchain);
+    VkResult result = vkCreateSwapchainKHR(m_Device.GetVkDevice(), &createInfo, nullptr, &m_Swapchain);
     EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create swapchain!");
 
     EM_CORE_INFO("Swapchain created");
 
     // Retrieve swapchain images
-    vkGetSwapchainImagesKHR(m_Device.GetDevice(), m_Swapchain, &imageCount, nullptr);
+    vkGetSwapchainImagesKHR(m_Device.GetVkDevice(), m_Swapchain, &imageCount, nullptr);
     m_SwapchainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(m_Device.GetDevice(), m_Swapchain, &imageCount, m_SwapchainImages.data());
+    vkGetSwapchainImagesKHR(m_Device.GetVkDevice(), m_Swapchain, &imageCount, m_SwapchainImages.data());
 
     m_SwapchainImageFormat = surfaceFormat.format;
     m_SwapchainExtent      = extent;
@@ -90,7 +90,7 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
         viewInfo.subresourceRange.baseArrayLayer = 0;
         viewInfo.subresourceRange.layerCount     = 1;
 
-        result = vkCreateImageView(m_Device.GetDevice(), &viewInfo, nullptr, &m_SwapchainImageViews[i]);
+        result = vkCreateImageView(m_Device.GetVkDevice(), &viewInfo, nullptr, &m_SwapchainImageViews[i]);
         EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create image view!");
     }
 }

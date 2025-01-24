@@ -20,16 +20,17 @@ class VulkanDevice
     VulkanDevice(VkInstance& instance, VkSurfaceKHR& surface);
     ~VulkanDevice();
 
-    VkDevice GetDevice() const { return m_Device; }
-    VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
-    VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
-    VkQueue GetPresentQueue() const { return m_PresentQueue; }
+    VkDevice GetVkDevice() const { return m_Device; }
+    VkPhysicalDevice GetVkPhysicalDevice() const { return m_PhysicalDevice; }
+    VkQueue GetVkGraphicsQueue() const { return m_GraphicsQueue; }
+    VkQueue GetVkPresentQueue() const { return m_PresentQueue; }
     QueueFamilyIndices GetQueueFamilyIndices() const { return m_QueueFamilyIndices; }
 
   private:
-    void PickPhysicalDevice();
     void CreateLogicalDevice();
     void CreateCommandPool();
+
+    void PickPhysicalDevice();
     bool IsDeviceSuitable(VkPhysicalDevice device);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     QueueFamilyIndices FindPhysicalQueueFamilies() { return FindQueueFamilies(m_PhysicalDevice); }
