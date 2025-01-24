@@ -7,7 +7,6 @@
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/ImGui/ImGuiLayer.h"
-#include "Platform/Vulkan/VulkanContext.h"
 
 int main(int argc, char** argv);
 
