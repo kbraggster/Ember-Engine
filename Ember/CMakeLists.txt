@@ -15,6 +15,14 @@ file(GLOB_RECURSE HEADER_FILES "${INCLUDE_DIR}/*.h")
 # Create static library
 add_library("${PROJECT_NAME}" STATIC ${SOURCE_FILES} ${HEADER_FILES})
 
+# Vulkan library path
+set(VULKAN_LIBRARY_DIR $ENV{VULKAN_SDK}/lib)
+
+# Use shaderc library from Vulkan path
+set(SHADERC_LIB "${VULKAN_LIBRARY_DIR}/libshaderc_shared.dylib")
+# Required by shaderc
+set(CMAKE_INSTALL_PREFIX vendor/shaderc/third_party/abseil_cpp)
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR})
 
 # Set output directory
@@ -72,6 +80,7 @@ endif ()
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/imgui)
+add_subdirectory(vendor/shaderc)
 
 # Set output directory for libraries
 set_target_properties(glfw PROPERTIES
@@ -89,6 +98,13 @@ target_include_directories(${PROJECT_NAME}
         PRIVATE ${Vulkan_INCLUDE_DIRS}
         PRIVATE Ember/vendor/glfw/include
         PRIVATE Ember/vendor/spdlog/include
-        PRIVATE Ember/vendor/imgui)
+        PRIVATE Ember/vendor/imgui
+        PRIVATE Ember/vendor/shaderc/libshaderc/include)
 
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw spdlog imgui)
+
+target_link_libraries(${PROJECT_NAME}
+        Vulkan::Vulkan
+        glfw
+        spdlog
+        imgui
+        ${SHADERC_LIB})
