@@ -4,6 +4,8 @@
 
 #include "LayerStack.h"
 
+#include "Engine/Events/Event.h"
+#include "Engine/Events/ApplicationEvent.h"
 #include "Engine/ImGui/ImGuiLayer.h"
 #include "Platform/Vulkan/VulkanContext.h"
 
@@ -20,6 +22,8 @@ class Application
 
     void Run();
 
+    void OnEvent(Event& e);
+
     void PushLayer(Layer* layer);
     void PushOverlay(Layer* layer);
 
@@ -27,9 +31,16 @@ class Application
 
     Window& GetWindow() { return *m_Window; }
 
+    void Close();
+
+  private:
+    bool OnWindowClose(WindowCloseEvent& e);
+    bool OnWindowResize(WindowResizeEvent& e);
+
   private:
     Scope<Window> m_Window;
-    bool m_Running = true;
+    bool m_Running   = true;
+    bool m_Minimized = false;
 
     LayerStack m_LayerStack;
     ImGuiLayer* m_ImGuiLayer;

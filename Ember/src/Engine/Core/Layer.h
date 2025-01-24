@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Engine/Events/Event.h"
+
 namespace Ember
 {
 
@@ -13,6 +15,7 @@ class Layer
     virtual void OnDetach() {}
     virtual void OnUpdate() {}
     virtual void OnImGuiRender() {}
+    virtual void OnEvent(Event& e) {}
 
     const std::string& GetName() const { return m_DebugName; }
 

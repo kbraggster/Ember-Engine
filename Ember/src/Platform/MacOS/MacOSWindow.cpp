@@ -1,5 +1,9 @@
 #include "MacOSWindow.h"
 
+#include "Engine/Events/ApplicationEvent.h"
+#include "Engine/Events/KeyEvent.h"
+#include "Engine/Events/MouseEvent.h"
+
 namespace Ember
 {
 
@@ -48,23 +52,29 @@ void MacOSWindow::Init(const WindowProps& props)
     m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(),
                                 nullptr, nullptr);
 
+    m_Context.reset(new VulkanContext(m_Window));
+    m_Context->Init();
+
     glfwSetWindowUserPointer(m_Window, &m_Data);
     SetVSync(true);
 
     // Set GLFW callbacks
+    // TODO: GLFW callbacks?
     glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
         WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
         data.Width  = width;
         data.Height = height;
+
+        // WindowResizeEvent event(width, height);
+        // data.EventCallback(event);
     });
 
     glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
         WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        WindowCloseEvent event;
+        data.EventCallback(event);
     });
-
-    m_Context.reset(new VulkanContext(m_Window));
-    m_Context->Init();
 }
 
 void MacOSWindow::Shutdown()

@@ -1,6 +1,8 @@
 #pragma once
+
 #include <string>
 #include <Engine/Renderer/GraphicsContext.h>
+#include "Engine/Events/Event.h"
 
 namespace Ember
 {
@@ -26,6 +28,8 @@ struct WindowProps
 class Window
 {
   public:
+    using EventCallbackFn = std::function<void(Event&)>;
+
     virtual ~Window() = default;
 
     virtual void OnUpdate() = 0;
@@ -34,8 +38,9 @@ class Window
     virtual unsigned int GetHeight() const = 0;
 
     // Window attributes
-    virtual void SetVSync(bool enabled) = 0;
-    virtual bool IsVSync() const        = 0;
+    virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+    virtual void SetVSync(bool enabled)                            = 0;
+    virtual bool IsVSync() const                                   = 0;
 
     virtual void* GetNativeWindow() const = 0;
     // virtual Ref<GraphicsContext> GetContext() const = 0;

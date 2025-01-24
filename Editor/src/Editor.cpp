@@ -1,5 +1,5 @@
-#include <Ember.h>
-#include <Engine/Core/EntryPoint.h>
+#include "Ember.h"
+#include "Engine/Core/EntryPoint.h"
 
 namespace Ember
 {
@@ -11,7 +11,7 @@ class ExampleLayer final : public Layer
 
     void OnUpdate() override {}
 
-    // void OnEvent(Event& event) override {}
+    void OnEvent(Event& event) override {}
 };
 
 class Editor : public Application
