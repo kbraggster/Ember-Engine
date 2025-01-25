@@ -50,7 +50,7 @@ void MacOSWindow::Init(const WindowProps& props)
     m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(),
                                 nullptr, nullptr);
 
-    m_Context.reset(new VulkanContext(m_Window));
+    m_Context = GraphicsContext::Create(m_Window);
     m_Context->Init();
 
     glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -83,6 +83,7 @@ void MacOSWindow::Shutdown()
 void MacOSWindow::OnUpdate()
 {
     glfwPollEvents();
+    // glfwSwapBuffers(m_Window);
 }
 
 void MacOSWindow::SetVSync(const bool enabled)

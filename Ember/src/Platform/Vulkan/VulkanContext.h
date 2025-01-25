@@ -1,9 +1,6 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 
 #include "Engine/Renderer/GraphicsContext.h"
 
@@ -11,20 +8,22 @@
 #include "Platform/Vulkan/VulkanDevice.h"
 #include "Platform/Vulkan/VulkanSwapchain.h"
 
+struct GLFWwindow;
+
 namespace Ember
 {
 
 class VulkanContext : public GraphicsContext
 {
   public:
-    explicit VulkanContext(GLFWwindow* windowHandle);
+    VulkanContext(GLFWwindow* windowHandle);
     ~VulkanContext() override;
 
     void Init() override;
 
   private:
     VkInstance CreateInstance();
-    void CreateSurface(GLFWwindow* windowHandle);
+    void CreateSurface();
 
   private:
     GLFWwindow* m_WindowHandle;

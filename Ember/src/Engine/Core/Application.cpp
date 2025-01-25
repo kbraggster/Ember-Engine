@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "Engine/Renderer/Renderer.h"
+
 namespace Ember
 {
 Application* Application::s_Instance = nullptr;
@@ -10,6 +12,8 @@ Application::Application()
 
     m_Window.reset(Window::Create());
     m_Window->SetEventCallback(EM_BIND_EVENT_FN(Application::OnEvent));
+
+    Renderer::Init();
 
     // m_ImGuiLayer = new ImGuiLayer(*m_Window);
     // PushOverlay(m_ImGuiLayer);

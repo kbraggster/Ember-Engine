@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Engine/Core/Window.h"
-
-#include "Platform/Vulkan/VulkanContext.h"
+#include "Engine/Renderer/GraphicsContext.h"
 
 #include <GLFW/glfw3.h>
 
@@ -32,7 +31,7 @@ class MacOSWindow : public Window
     virtual void Shutdown();
 
     GLFWwindow* m_Window;
-    Ref<VulkanContext> m_Context;
+    Scope<GraphicsContext> m_Context;
 
     struct WindowData
     {

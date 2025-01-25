@@ -1,5 +1,9 @@
 #include "VulkanContext.h"
 
+#define GLFW_INCLUDE_NONE
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 namespace Ember
 {
 
@@ -31,7 +35,7 @@ void VulkanContext::Init()
 
     m_DebugUtils.SetupDebugUtils(m_Instance);
 
-    CreateSurface(m_WindowHandle);
+    CreateSurface();
 
     m_Device.reset(new VulkanDevice(m_Instance, m_Surface));
 
@@ -82,9 +86,9 @@ VkInstance VulkanContext::CreateInstance()
     return instance;
 }
 
-void VulkanContext::CreateSurface(GLFWwindow* windowHandle)
+void VulkanContext::CreateSurface()
 {
-    if (glfwCreateWindowSurface(m_Instance, windowHandle, nullptr, &m_Surface))
+    if (glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface))
         EM_CORE_ERROR("Error creating window surface!");
 }
 
