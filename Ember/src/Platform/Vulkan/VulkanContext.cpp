@@ -15,12 +15,16 @@ VulkanContext::VulkanContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHa
 VulkanContext::~VulkanContext()
 {
     m_Swapchain.reset();
+    m_Device.reset();
+
     if (m_Surface != VK_NULL_HANDLE)
     {
         vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
         m_Surface = VK_NULL_HANDLE;
     }
+
     m_DebugUtils.DestroyDebugUtils(m_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
+
     if (m_Instance != VK_NULL_HANDLE)
     {
         vkDestroyInstance(m_Instance, nullptr);

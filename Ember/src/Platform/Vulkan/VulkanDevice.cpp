@@ -12,17 +12,11 @@ VulkanDevice::VulkanDevice(VkInstance& instance, VkSurfaceKHR& surface) : m_Inst
 
 VulkanDevice::~VulkanDevice()
 {
-    if (m_Device != VK_NULL_HANDLE)
-    {
-        if (m_CommandPool != VK_NULL_HANDLE)
-        {
-            vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
-            m_CommandPool = VK_NULL_HANDLE;
-        }
+    vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
+    m_CommandPool = VK_NULL_HANDLE;
 
-        vkDestroyDevice(m_Device, nullptr);
-        m_Device = VK_NULL_HANDLE;
-    }
+    vkDestroyDevice(m_Device, nullptr);
+    m_Device = VK_NULL_HANDLE;
 }
 
 void VulkanDevice::PickPhysicalDevice()
