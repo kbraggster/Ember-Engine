@@ -16,7 +16,7 @@ VulkanContext::VulkanContext()
 VulkanContext::~VulkanContext()
 {
     m_Swapchain.reset();
-    // m_Device.reset();
+    m_Device.reset();
 
     vkDestroySurfaceKHR(s_Instance, m_Surface, nullptr);
     m_Surface = VK_NULL_HANDLE;
