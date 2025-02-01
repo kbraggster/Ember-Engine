@@ -2,6 +2,8 @@
 
 #include "Engine/Events/ApplicationEvent.h"
 
+#include "Platform/Vulkan/VulkanContext.h"
+
 namespace Ember
 {
 
@@ -50,8 +52,8 @@ void MacOSWindow::Init(const WindowProps& props)
     m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(),
                                 nullptr, nullptr);
 
-    m_Context = GraphicsContext::Create(m_Window);
-    m_Context->Init();
+    m_RendererContext = RendererContext::Create();
+    m_RendererContext->Init();
 
     glfwSetWindowUserPointer(m_Window, &m_Data);
     SetVSync(true);

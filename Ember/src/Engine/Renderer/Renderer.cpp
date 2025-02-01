@@ -1,16 +1,45 @@
 #include "Renderer.h"
 
+#include "Engine/Renderer/RendererAPI.h"
+
+#include "Platform/Vulkan/VulkanContext.h"
+#include "Platform/Vulkan/VulkanRenderer.h"
+
+#include "Engine/Core/Application.h"
+
 namespace Ember
 {
 
-void Renderer::Init()
+static RendererAPI* s_RendererAPI = nullptr;
+
+static RendererAPI* InitRendererAPI()
 {
-    RenderCommand::Init();
+    switch (RendererAPI::GetAPI())
+    {
+        case RendererAPI::API::None:
+            break;
+        case RendererAPI::API::Vulkan:
+            return new VulkanRenderer();
+    }
+    EM_CORE_ASSERT(false, "Unknown RendererAPI!");
+    return nullptr;
 }
 
-void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+void Renderer::Init()
 {
-    RenderCommand::SetViewport(0, 0, width, height);
+    s_RendererAPI = InitRendererAPI();
+
+    s_RendererAPI->Init();
+}
+
+Ref<RendererContext> Renderer::GetContext()
+{
+    return Application::Get().GetWindow().GetRenderContext();
+}
+
+void RendererAPI::SetAPI(API api)
+{
+    s_API = api;
 }
 
 } // namespace Ember

@@ -22,7 +22,7 @@ class ImGuiLayer : public Layer
     void End();
 
   private:
-    Ref<VulkanContext> m_Context;
+    // Ref<VulkanContext> m_Context;
     float m_Time = 0.0f;
 };
 

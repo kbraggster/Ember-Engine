@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Engine/Core/Window.h"
-#include "Engine/Renderer/GraphicsContext.h"
 
+#include "Engine/Renderer/RendererContext.h"
+
+#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 
 namespace Ember
@@ -26,12 +28,15 @@ class MacOSWindow : public Window
 
     void* GetNativeWindow() const override { return m_Window; }
 
+    Ref<RendererContext> GetRenderContext() override { return m_RendererContext; };
+
   private:
     virtual void Init(const WindowProps& props);
     virtual void Shutdown();
 
+  private:
     GLFWwindow* m_Window;
-    Scope<GraphicsContext> m_Context;
+    Ref<RendererContext> m_RendererContext;
 
     struct WindowData
     {

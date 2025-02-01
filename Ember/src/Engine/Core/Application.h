@@ -8,8 +8,6 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/ImGui/ImGuiLayer.h"
 
-int main(int argc, char** argv);
-
 namespace Ember
 {
 
@@ -26,11 +24,11 @@ class Application
     void PushLayer(Layer* layer);
     void PushOverlay(Layer* layer);
 
-    static Application& Get() { return *s_Instance; }
+    void Close();
 
     Window& GetWindow() { return *m_Window; }
 
-    void Close();
+    static Application& Get() { return *s_Instance; }
 
   private:
     bool OnWindowClose(WindowCloseEvent& e);
@@ -42,9 +40,11 @@ class Application
     bool m_Minimized = false;
 
     LayerStack m_LayerStack;
-    ImGuiLayer* m_ImGuiLayer;
+    // ImGuiLayer* m_ImGuiLayer;
 
     static Application* s_Instance;
+
+    friend class Renderer;
 };
 
 // To be defined in CLIENT

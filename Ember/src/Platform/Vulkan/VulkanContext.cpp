@@ -1,5 +1,7 @@
 #include "VulkanContext.h"
 
+#include "Vulkan.h"
+
 #define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -7,44 +9,37 @@
 namespace Ember
 {
 
-VulkanContext::VulkanContext(GLFWwindow* windowHandle) : m_WindowHandle(windowHandle)
+VulkanContext::VulkanContext()
 {
-    EM_ASSERT(windowHandle, "Window handle is null");
 }
 
 VulkanContext::~VulkanContext()
 {
     m_Swapchain.reset();
-    m_Device.reset();
+    // m_Device.reset();
 
-    if (m_Surface != VK_NULL_HANDLE)
-    {
-        vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
-        m_Surface = VK_NULL_HANDLE;
-    }
+    vkDestroySurfaceKHR(s_Instance, m_Surface, nullptr);
+    m_Surface = VK_NULL_HANDLE;
 
-    m_DebugUtils.DestroyDebugUtils(m_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
+    m_DebugUtils.DestroyDebugUtils(s_Instance, m_DebugUtils.GetDebugMessenger(), nullptr);
 
-    if (m_Instance != VK_NULL_HANDLE)
-    {
-        vkDestroyInstance(m_Instance, nullptr);
-        m_Instance = VK_NULL_HANDLE;
-    }
+    vkDestroyInstance(s_Instance, nullptr);
+    s_Instance = VK_NULL_HANDLE;
 }
 
 void VulkanContext::Init()
 {
-    m_Instance = CreateInstance();
+    s_Instance = CreateInstance();
     EM_CORE_INFO("Vulkan instance created");
 
-    m_DebugUtils.SetupDebugUtils(m_Instance);
+    m_DebugUtils.SetupDebugUtils(s_Instance);
 
-    CreateSurface();
+    // CreateSurface();
 
-    m_Device.reset(new VulkanDevice(m_Instance, m_Surface));
+    m_Device.reset(new VulkanDevice(s_Instance, m_Surface));
 
-    m_Swapchain.reset(new VulkanSwapchain(*m_Device, m_Surface));
-    m_Swapchain->CreateSwapchain(2560, 1440);
+    // m_Swapchain.reset(new VulkanSwapchain(*m_Device, m_Surface));
+    // m_Swapchain->CreateSwapchain(2560, 1440);
 }
 
 VkInstance VulkanContext::CreateInstance()
@@ -92,7 +87,7 @@ VkInstance VulkanContext::CreateInstance()
 
 void VulkanContext::CreateSurface()
 {
-    if (glfwCreateWindowSurface(m_Instance, m_WindowHandle, nullptr, &m_Surface))
+    if (glfwCreateWindowSurface(s_Instance, m_WindowHandle, nullptr, &m_Surface))
         EM_CORE_ERROR("Error creating window surface!");
 }
 

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
-
-#include "Engine/Renderer/GraphicsContext.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include "Platform/Vulkan/VulkanDebugUtils.h"
 #include "Platform/Vulkan/VulkanDevice.h"
@@ -13,22 +11,27 @@ struct GLFWwindow;
 namespace Ember
 {
 
-class VulkanContext : public GraphicsContext
+class VulkanContext : public RendererContext
 {
   public:
-    VulkanContext(GLFWwindow* windowHandle);
+    VulkanContext();
     ~VulkanContext() override;
 
     void Init() override;
+
+    static VkInstance GetInstance() { return s_Instance; }
+
+    static Ref<VulkanContext> Get() { return std::static_pointer_cast<VulkanContext>(Renderer::GetContext()); }
 
   private:
     VkInstance CreateInstance();
     void CreateSurface();
 
   private:
+    inline static VkInstance s_Instance;
+
     GLFWwindow* m_WindowHandle;
 
-    VkInstance m_Instance;
     VkSurfaceKHR m_Surface;
     VulkanDebugUtils m_DebugUtils;
     Ref<VulkanDevice> m_Device;
