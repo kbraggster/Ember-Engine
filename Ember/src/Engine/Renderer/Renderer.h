@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RendererContext.h"
+#include "Engine/Renderer/RendererAPI.h"
 
 namespace Ember
 {
@@ -12,7 +13,7 @@ class Renderer
     static void Init();
 
     static Ref<RendererContext> GetContext();
-    // static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+    static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 };
 
 } // namespace Ember

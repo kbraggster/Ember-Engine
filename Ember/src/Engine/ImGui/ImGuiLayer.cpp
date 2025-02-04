@@ -14,8 +14,8 @@
 namespace Ember
 {
 
-ImGuiLayer::ImGuiLayer(const Window& window)
-    : Layer("ImGuiLayer") //, m_Context(std::static_pointer_cast<VulkanContext>(window.GetContext()))
+ImGuiLayer::ImGuiLayer(Window& window)
+    : Layer("ImGuiLayer"), m_Context(std::dynamic_pointer_cast<VulkanContext>(window.GetRenderContext()))
 {
 }
 
@@ -48,22 +48,19 @@ void ImGuiLayer::OnAttach()
     Application& app   = Application::Get();
     GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
-    // ImGui_ImplGlfw_InitForVulkan(window, true);
+    ImGui_ImplGlfw_InitForVulkan(window, true);
     // ImGui_ImplVulkan_InitInfo init_info = {};
-    // init_info.Instance                  = m_Context->GetInstance();
-    // init_info.PhysicalDevice            = m_Context->GetDevice().GetPhysicalDevice();
-    // init_info.Device                    = m_Context->GetDevice().GetVkDevice();
-    // init_info.QueueFamily               = m_Context->GetDevice().GetQueueFamilyIndices().GraphicsFamily;
-    // init_info.Queue                     = m_Context->GetDevice().GetGraphicsQueue();
+    // init_info.Instance                  = VulkanContext::GetInstance();
+    // init_info.PhysicalDevice            = m_Context->GetDevice()->GetVkPhysicalDevice();
+    // init_info.Device                    = m_Context->GetDevice()->GetVkDevice();
+    // init_info.QueueFamily               = m_Context->GetDevice()->GetQueueFamilyIndices().GraphicsFamily;
+    // init_info.Queue                     = m_Context->GetDevice()->GetVkGraphicsQueue();
     // init_info.PipelineCache             = VK_NULL_HANDLE;
-    // init_info.DescriptorPool = m_Context->GetDescriptorPool();
-    // init_info.RenderPass     = m_Context->GetSwapchain().GetRenderPass();
-    // init_info.Subpass        = 0;
-    // init_info.MinImageCount  = m_Context->GetSwapchain().GetMinImageCount();
-    // init_info.ImageCount     = m_Context->GetSwapchain().GetImageCount();
-    // init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-    // init_info.Allocator = g_Allocator;
-    // init_info.CheckVkResultFn = check_vk_result;
+    // init_info.DescriptorPool            = m_Context->GetVkDescriptorPool();
+    // init_info.RenderPass                = m_Context->GetSwapchain()->GetRenderPass();
+    // init_info.Subpass                   = 0;
+    // init_info.MinImageCount             = 2;
+    // init_info.ImageCount                = m_Context->GetSwapchain()->GetImageCount();
     // ImGui_ImplVulkan_Init(&init_info);
 }
 
@@ -90,6 +87,10 @@ void ImGuiLayer::End()
 
     // Rendering
     ImGui::Render();
+    // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+
+    // End render pass
+    // vkCmdEndRenderPass(commandBuffer);
 
     // Record Vulkan commands for ImGui rendering
     // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_Context->GetCommandBuffer());

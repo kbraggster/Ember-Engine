@@ -19,6 +19,9 @@ class VulkanContext : public RendererContext
 
     void Init() override;
 
+    Ref<VulkanDevice> GetDevice() { return m_Device; }
+    Ref<VulkanSwapchain> GetSwapchain() { return m_Swapchain; }
+
     static VkInstance GetInstance() { return s_Instance; }
 
     static Ref<VulkanContext> Get() { return std::static_pointer_cast<VulkanContext>(Renderer::GetContext()); }

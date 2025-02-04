@@ -11,7 +11,7 @@ namespace Ember
 class ImGuiLayer : public Layer
 {
   public:
-    ImGuiLayer(const Window& window);
+    ImGuiLayer(Window& window);
     ~ImGuiLayer() override = default;
 
     void OnAttach() override;
@@ -22,7 +22,7 @@ class ImGuiLayer : public Layer
     void End();
 
   private:
-    // Ref<VulkanContext> m_Context;
+    Ref<VulkanContext> m_Context;
     float m_Time = 0.0f;
 };
 
