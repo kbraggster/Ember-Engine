@@ -34,7 +34,7 @@ void VulkanContext::Init()
 
     m_DebugUtils.SetupDebugUtils(s_Instance);
 
-    // CreateSurface();
+    CreateSurface();
 
     m_Device.reset(new VulkanDevice(s_Instance, m_Surface));
 

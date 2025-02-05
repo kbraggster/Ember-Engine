@@ -53,6 +53,7 @@ void MacOSWindow::Init(const WindowProps& props)
                                 nullptr, nullptr);
 
     m_RendererContext = RendererContext::Create();
+    m_RendererContext->SetWindowHandle(m_Window);
     m_RendererContext->Init();
 
     glfwSetWindowUserPointer(m_Window, &m_Data);

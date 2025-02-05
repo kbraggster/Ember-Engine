@@ -22,6 +22,8 @@ class VulkanContext : public RendererContext
     Ref<VulkanDevice> GetDevice() { return m_Device; }
     Ref<VulkanSwapchain> GetSwapchain() { return m_Swapchain; }
 
+    void SetWindowHandle(GLFWwindow* window) override { m_WindowHandle = window; }
+
     static VkInstance GetInstance() { return s_Instance; }
 
     static Ref<VulkanContext> Get() { return std::static_pointer_cast<VulkanContext>(Renderer::GetContext()); }
