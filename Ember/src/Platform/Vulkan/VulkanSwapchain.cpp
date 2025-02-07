@@ -10,6 +10,15 @@ VulkanSwapchain::VulkanSwapchain(const VulkanDevice& device, const VkSurfaceKHR&
 
 VulkanSwapchain::~VulkanSwapchain()
 {
+    vkDestroySemaphore(m_Device.GetVkDevice(), m_ImageAvailableSemaphore, nullptr);
+    m_ImageAvailableSemaphore = VK_NULL_HANDLE;
+    EM_CORE_INFO("Image available semaphore destroyed");
+
+    // Destroy the render finished semaphore if you have it
+    vkDestroySemaphore(m_Device.GetVkDevice(), m_RenderFinishedSemaphore, nullptr);
+    m_RenderFinishedSemaphore = VK_NULL_HANDLE;
+    EM_CORE_INFO("Render finished semaphore destroyed");
+
     for (auto imageView : m_SwapchainImageViews)
     {
         vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
@@ -92,7 +101,42 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
 
         result = vkCreateImageView(m_Device.GetVkDevice(), &viewInfo, nullptr, &m_SwapchainImageViews[i]);
         EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create image view!");
+
+        CreateSemaphores();
     }
+}
+
+void VulkanSwapchain::CreateSemaphores()
+{
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    // Create the image available semaphore (already exists)
+    VK_CHECK_RESULT(vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore));
+    EM_CORE_INFO("Vulkan Image available semaphore created");
+
+    // Create the render finished semaphore
+    VK_CHECK_RESULT(vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore));
+    EM_CORE_INFO("Vulkan Render finished semaphore created");
+}
+
+uint32_t VulkanSwapchain::AcquireNextImage()
+{
+    uint32_t imageIndex;
+    VkResult result = vkAcquireNextImageKHR(m_Device.GetVkDevice(), m_Swapchain, UINT64_MAX, m_ImageAvailableSemaphore,
+                                            VK_NULL_HANDLE, &imageIndex);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        EM_CORE_WARN("Swapchain out of date; recreate swapchain!");
+        return UINT32_MAX;
+    }
+    if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    {
+        EM_CORE_ASSERT(false, "Failed to acquire swapchain image!");
+    }
+
+    return imageIndex;
 }
 
 VulkanSwapchain::SwapchainSupportDetails VulkanSwapchain::QuerySwapchainSupport(VkPhysicalDevice device,

@@ -49,19 +49,19 @@ void ImGuiLayer::OnAttach()
     GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
     ImGui_ImplGlfw_InitForVulkan(window, true);
-    // ImGui_ImplVulkan_InitInfo init_info = {};
-    // init_info.Instance                  = VulkanContext::GetInstance();
-    // init_info.PhysicalDevice            = m_Context->GetDevice()->GetVkPhysicalDevice();
-    // init_info.Device                    = m_Context->GetDevice()->GetVkDevice();
-    // init_info.QueueFamily               = m_Context->GetDevice()->GetQueueFamilyIndices().GraphicsFamily;
-    // init_info.Queue                     = m_Context->GetDevice()->GetVkGraphicsQueue();
-    // init_info.PipelineCache             = VK_NULL_HANDLE;
-    // init_info.DescriptorPool            = m_Context->GetVkDescriptorPool();
-    // init_info.RenderPass                = m_Context->GetSwapchain()->GetRenderPass();
-    // init_info.Subpass                   = 0;
-    // init_info.MinImageCount             = 2;
-    // init_info.ImageCount                = m_Context->GetSwapchain()->GetImageCount();
-    // ImGui_ImplVulkan_Init(&init_info);
+    ImGui_ImplVulkan_InitInfo init_info = {};
+    init_info.Instance                  = VulkanContext::GetInstance();
+    init_info.PhysicalDevice            = m_Context->GetDevice()->GetVkPhysicalDevice();
+    init_info.Device                    = m_Context->GetDevice()->GetVkDevice();
+    init_info.QueueFamily               = m_Context->GetDevice()->GetQueueFamilyIndices().GraphicsFamily;
+    init_info.Queue                     = m_Context->GetDevice()->GetVkGraphicsQueue();
+    init_info.PipelineCache             = VK_NULL_HANDLE;
+    init_info.DescriptorPool            = m_Context->GetDescriptorPool();
+    init_info.RenderPass                = m_Context->GetRenderPass();
+    init_info.Subpass                   = 0;
+    init_info.MinImageCount             = 2;
+    init_info.ImageCount                = 2;
+    ImGui_ImplVulkan_Init(&init_info);
 }
 
 void ImGuiLayer::OnDetach()
@@ -73,7 +73,6 @@ void ImGuiLayer::OnDetach()
 
 void ImGuiLayer::Begin()
 {
-    // m_Context->BeginCommandBuffer();
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -85,20 +84,39 @@ void ImGuiLayer::End()
     Application& app = Application::Get();
     io.DisplaySize   = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
 
-    // Rendering
+    // Render ImGui draw data
     ImGui::Render();
-    // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
-    // End render pass
-    // vkCmdEndRenderPass(commandBuffer);
+    uint32_t currentFrameIndex = m_Context->GetSwapchain()->AcquireNextImage();
+
+    VkCommandBuffer commandBuffer = m_Context->GetCommandBuffer(currentFrameIndex);
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass        = m_Context->GetRenderPass();
+    renderPassInfo.framebuffer       = m_Context->GetFramebuffer(currentFrameIndex);
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = m_Context->GetSwapchain()->GetExtent();
+
+    VkClearValue clearValue{};
+    clearValue.color               = {{1.0f, 0.1f, 0.1f, 1.0f}};
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues    = &clearValue;
+
+    m_Context->BeginCommandBuffer(currentFrameIndex);
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     // Record Vulkan commands for ImGui rendering
-    // ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_Context->GetCommandBuffer());
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
-    // Clear the screen with the desired color (in the RenderPass setup)
-    // m_Context->EndCommandBuffer();
-    // m_Context->SubmitCommandBuffer();
+    // End the render pass
+    vkCmdEndRenderPass(commandBuffer);
 
+    // Submit recorded command buffer
+    m_Context->EndCommandBuffer(currentFrameIndex);
+    m_Context->SubmitCommandBuffer(currentFrameIndex);
+
+    // Handle platform windows rendering if enabled
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         GLFWwindow* backupContext = glfwGetCurrentContext();

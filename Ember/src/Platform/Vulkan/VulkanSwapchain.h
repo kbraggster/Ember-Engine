@@ -14,6 +14,16 @@ class VulkanSwapchain
     ~VulkanSwapchain();
 
     void CreateSwapchain(uint32_t width, uint32_t height);
+    void CreateSemaphores();
+
+    uint32_t AcquireNextImage();
+
+    VkSwapchainKHR GetSwapchain() const { return m_Swapchain; }
+    uint32_t GetImageCount() const { return static_cast<uint32_t>(m_SwapchainImages.size()); }
+    const std::vector<VkImageView>& GetImageViews() const { return m_SwapchainImageViews; }
+    VkExtent2D GetExtent() const { return m_SwapchainExtent; }
+    VkSemaphore GetImageAvailableSemaphore() const { return m_ImageAvailableSemaphore; }
+    VkSemaphore GetImageRenderFinishedSemaphore() const { return m_RenderFinishedSemaphore; }
 
   private:
     struct SwapchainSupportDetails
@@ -34,6 +44,9 @@ class VulkanSwapchain
     VkSwapchainKHR m_Swapchain = VK_NULL_HANDLE;
     std::vector<VkImage> m_SwapchainImages;
     std::vector<VkImageView> m_SwapchainImageViews;
+
+    VkSemaphore m_ImageAvailableSemaphore = VK_NULL_HANDLE;
+    VkSemaphore m_RenderFinishedSemaphore = VK_NULL_HANDLE;
 
     VkFormat m_SwapchainImageFormat;
     VkExtent2D m_SwapchainExtent;

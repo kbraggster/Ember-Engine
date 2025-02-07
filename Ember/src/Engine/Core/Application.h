@@ -40,7 +40,7 @@ class Application
     bool m_Minimized = false;
 
     LayerStack m_LayerStack;
-    // ImGuiLayer* m_ImGuiLayer;
+    ImGuiLayer* m_ImGuiLayer;
 
     static Application* s_Instance;
 

@@ -15,8 +15,8 @@ Application::Application()
 
     Renderer::Init();
 
-    // m_ImGuiLayer = new ImGuiLayer(*m_Window);
-    // PushOverlay(m_ImGuiLayer);
+    m_ImGuiLayer = new ImGuiLayer(*m_Window);
+    PushOverlay(m_ImGuiLayer);
 }
 
 void Application::Run()
@@ -30,12 +30,12 @@ void Application::Run()
                     layer->OnUpdate();
             }
 
-            // m_ImGuiLayer->Begin();
-            // {
-            // for (Layer* layer : m_LayerStack)
-            // layer->OnImGuiRender();
-            // }
-            // m_ImGuiLayer->End();
+            m_ImGuiLayer->Begin();
+            {
+                for (Layer* layer : m_LayerStack)
+                    layer->OnImGuiRender();
+            }
+            m_ImGuiLayer->End();
         }
 
         m_Window->OnUpdate();
