@@ -64,7 +64,7 @@ void VulkanContext::Init()
     CreateRenderPass();
 
     m_Swapchain.reset(new VulkanSwapchain(*m_Device, m_Surface));
-    m_Swapchain->CreateSwapchain(2560, 1440);
+    m_Swapchain->CreateSwapchain(1280, 720);
 
     CreateCommandBuffers();
     CreateFramebuffers();
@@ -74,21 +74,23 @@ void VulkanContext::BeginCommandBuffer(uint32_t frameIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags            = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    beginInfo.flags            = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
     beginInfo.pInheritanceInfo = nullptr;
 
-    VkResult result = vkBeginCommandBuffer(m_CommandBuffers[frameIndex], &beginInfo);
-    EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to begin command buffer!");
+    VK_CHECK_RESULT(vkBeginCommandBuffer(m_CommandBuffers[frameIndex], &beginInfo));
 }
 
 void VulkanContext::SubmitCommandBuffer(uint32_t frameIndex)
 {
     // Wait for the image to be available
-    VkSemaphore waitSemaphores[]      = {m_Swapchain->GetImageAvailableSemaphore()};
+    VkSemaphore waitSemaphores[]      = {m_Swapchain->GetImageAvailableSemaphores()[frameIndex]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 
     // Signal when the command buffer finishes executing
-    VkSemaphore signalSemaphores[] = {m_Swapchain->GetImageRenderFinishedSemaphore()};
+    VkSemaphore signalSemaphores[] = {m_Swapchain->GetImageRenderFinishedSemaphores()[frameIndex]};
+
+    // No reset needed if already reset before recording
+    EM_CORE_ASSERT(m_CommandBuffers[frameIndex] != VK_NULL_HANDLE, "Invalid command buffer");
 
     // Set up the submit info
     VkSubmitInfo submitInfo{};
@@ -102,8 +104,15 @@ void VulkanContext::SubmitCommandBuffer(uint32_t frameIndex)
     submitInfo.pSignalSemaphores    = signalSemaphores;
 
     // Submit the command buffer to the queue
-    VkResult result = vkQueueSubmit(m_Device->GetVkGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-    EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to submit command buffer to queue!");
+    VkResult result =
+        vkQueueSubmit(m_Device->GetVkGraphicsQueue(), 1, &submitInfo, m_Swapchain->GetInFlightFences()[frameIndex]);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+    {
+        EM_CORE_WARN("Submit command buffers failed. Recreating Swapchain");
+        RecreateSwapchain();
+    }
+    else
+        EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to submit command buffer to queue!");
 
     // Present the swapchain image
     VkSwapchainKHR swapchain = m_Swapchain->GetSwapchain();
@@ -169,19 +178,28 @@ VkInstance VulkanContext::CreateInstance()
 
 void VulkanContext::CreateSurface()
 {
-    if (glfwCreateWindowSurface(s_Instance, m_WindowHandle, nullptr, &m_Surface))
-        EM_CORE_ERROR("Error creating window surface!");
+    VK_CHECK_RESULT(glfwCreateWindowSurface(s_Instance, m_WindowHandle, nullptr, &m_Surface));
 }
 
 void VulkanContext::CreateDescriptorPool()
 {
     VkDescriptorPoolSize pool_sizes[] = {
         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE},
-    };
+        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType                      = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.flags                      = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    pool_info.maxSets                    = 0;
+    pool_info.maxSets                    = IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE;
     for (VkDescriptorPoolSize& pool_size : pool_sizes)
         pool_info.maxSets += pool_size.descriptorCount;
     pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
@@ -193,10 +211,10 @@ void VulkanContext::CreateDescriptorPool()
 void VulkanContext::CreateRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format         = VK_FORMAT_B8G8R8A8_SRGB; // e.g., VK_FORMAT_B8G8R8A8_SRGB or your swapchain format
+    colorAttachment.format         = VK_FORMAT_B8G8R8A8_SRGB;
     colorAttachment.samples        = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;  // Clear the framebuffer at the start
-    colorAttachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE; // Store the result after rendering
+    colorAttachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -264,6 +282,38 @@ void VulkanContext::CreateFramebuffers()
 
         VK_CHECK_RESULT(vkCreateFramebuffer(m_Device->GetVkDevice(), &framebufferInfo, nullptr, &m_Framebuffers[i]));
     }
+}
+
+void VulkanContext::RecreateSwapchain()
+{
+    // Wait for device to finish all operations
+    vkDeviceWaitIdle(m_Device->GetVkDevice());
+
+    // Clean up framebuffers
+    for (auto framebuffer : m_Framebuffers)
+    {
+        vkDestroyFramebuffer(m_Device->GetVkDevice(), framebuffer, nullptr);
+    }
+    m_Framebuffers.clear();
+
+    // Destroy existing swapchain
+    m_Swapchain->Cleanup();
+
+    // Recreate the swapchain
+    int width, height;
+    glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+    while (width == 0 || height == 0)
+    {
+        glfwGetFramebufferSize(m_WindowHandle, &width, &height);
+        glfwWaitEvents();
+    }
+
+    m_Swapchain->CreateSwapchain(width, height);
+
+    // Recreate framebuffers for the new swapchain
+    CreateFramebuffers();
+
+    EM_CORE_INFO("Swapchain recreated successfully");
 }
 
 } // namespace Ember

@@ -18,12 +18,15 @@ class VulkanSwapchain
 
     uint32_t AcquireNextImage();
 
+    void Cleanup();
+
     VkSwapchainKHR GetSwapchain() const { return m_Swapchain; }
     uint32_t GetImageCount() const { return static_cast<uint32_t>(m_SwapchainImages.size()); }
     const std::vector<VkImageView>& GetImageViews() const { return m_SwapchainImageViews; }
     VkExtent2D GetExtent() const { return m_SwapchainExtent; }
-    VkSemaphore GetImageAvailableSemaphore() const { return m_ImageAvailableSemaphore; }
-    VkSemaphore GetImageRenderFinishedSemaphore() const { return m_RenderFinishedSemaphore; }
+    std::vector<VkSemaphore> GetImageAvailableSemaphores() const { return m_ImageAvailableSemaphores; }
+    std::vector<VkSemaphore> GetImageRenderFinishedSemaphores() const { return m_RenderFinishedSemaphores; }
+    std::vector<VkFence> GetInFlightFences() const { return m_InFlightFences; }
 
   private:
     struct SwapchainSupportDetails
@@ -45,8 +48,11 @@ class VulkanSwapchain
     std::vector<VkImage> m_SwapchainImages;
     std::vector<VkImageView> m_SwapchainImageViews;
 
-    VkSemaphore m_ImageAvailableSemaphore = VK_NULL_HANDLE;
-    VkSemaphore m_RenderFinishedSemaphore = VK_NULL_HANDLE;
+    const uint32_t MAX_FRAMES_IN_FLIGHT = 3;
+    size_t m_CurrentFrame               = 0;
+    std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+    std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+    std::vector<VkFence> m_InFlightFences;
 
     VkFormat m_SwapchainImageFormat;
     VkExtent2D m_SwapchainExtent;

@@ -44,6 +44,8 @@ class VulkanContext : public RendererContext
     void CreateCommandBuffers();
     void CreateFramebuffers();
 
+    void RecreateSwapchain();
+
   private:
     inline static VkInstance s_Instance;
 

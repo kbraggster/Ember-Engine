@@ -10,23 +10,14 @@ VulkanSwapchain::VulkanSwapchain(const VulkanDevice& device, const VkSurfaceKHR&
 
 VulkanSwapchain::~VulkanSwapchain()
 {
-    vkDestroySemaphore(m_Device.GetVkDevice(), m_ImageAvailableSemaphore, nullptr);
-    m_ImageAvailableSemaphore = VK_NULL_HANDLE;
-    EM_CORE_INFO("Image available semaphore destroyed");
-
-    // Destroy the render finished semaphore if you have it
-    vkDestroySemaphore(m_Device.GetVkDevice(), m_RenderFinishedSemaphore, nullptr);
-    m_RenderFinishedSemaphore = VK_NULL_HANDLE;
-    EM_CORE_INFO("Render finished semaphore destroyed");
-
-    for (auto imageView : m_SwapchainImageViews)
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
+        vkDestroySemaphore(m_Device.GetVkDevice(), m_ImageAvailableSemaphores[i], nullptr);
+        vkDestroySemaphore(m_Device.GetVkDevice(), m_RenderFinishedSemaphores[i], nullptr);
+        vkDestroyFence(m_Device.GetVkDevice(), m_InFlightFences[i], nullptr);
     }
-    m_SwapchainImageViews.clear();
 
-    vkDestroySwapchainKHR(m_Device.GetVkDevice(), m_Swapchain, nullptr);
-    m_Swapchain = VK_NULL_HANDLE;
+    Cleanup();
 }
 
 void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
@@ -101,30 +92,42 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
 
         result = vkCreateImageView(m_Device.GetVkDevice(), &viewInfo, nullptr, &m_SwapchainImageViews[i]);
         EM_CORE_ASSERT(result == VK_SUCCESS, "Failed to create image view!");
-
-        CreateSemaphores();
     }
+    CreateSemaphores();
 }
 
 void VulkanSwapchain::CreateSemaphores()
 {
+    m_ImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    m_RenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    m_InFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    // Create the image available semaphore (already exists)
-    VK_CHECK_RESULT(vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore));
-    EM_CORE_INFO("Vulkan Image available semaphore created");
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    // Create the render finished semaphore
-    VK_CHECK_RESULT(vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore));
-    EM_CORE_INFO("Vulkan Render finished semaphore created");
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        VK_CHECK_RESULT(
+            vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphores[i]));
+        VK_CHECK_RESULT(
+            vkCreateSemaphore(m_Device.GetVkDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphores[i]));
+        VK_CHECK_RESULT(vkCreateFence(m_Device.GetVkDevice(), &fenceInfo, nullptr, &m_InFlightFences[i]));
+    }
 }
 
 uint32_t VulkanSwapchain::AcquireNextImage()
 {
+    VK_CHECK_RESULT(vkWaitForFences(m_Device.GetVkDevice(), 1, &m_InFlightFences[m_CurrentFrame], VK_TRUE, UINT32_MAX));
+    VK_CHECK_RESULT(vkResetFences(m_Device.GetVkDevice(), 1, &m_InFlightFences[m_CurrentFrame]));
+
+    // uint32_t imageIndex;
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(m_Device.GetVkDevice(), m_Swapchain, UINT64_MAX, m_ImageAvailableSemaphore,
-                                            VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(m_Device.GetVkDevice(), m_Swapchain, UINT32_MAX,
+                                            m_ImageAvailableSemaphores[m_CurrentFrame], VK_NULL_HANDLE, &imageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
@@ -132,11 +135,24 @@ uint32_t VulkanSwapchain::AcquireNextImage()
         return UINT32_MAX;
     }
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-    {
         EM_CORE_ASSERT(false, "Failed to acquire swapchain image!");
-    }
+
+    EM_CORE_ASSERT(imageIndex < MAX_FRAMES_IN_FLIGHT, "Frame index out of bounds");
+
+    m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return imageIndex;
+}
+
+void VulkanSwapchain::Cleanup()
+{
+    for (auto imageView : m_SwapchainImageViews)
+        vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
+
+    m_SwapchainImageViews.clear();
+
+    vkDestroySwapchainKHR(m_Device.GetVkDevice(), m_Swapchain, nullptr);
+    m_Swapchain = VK_NULL_HANDLE;
 }
 
 VulkanSwapchain::SwapchainSupportDetails VulkanSwapchain::QuerySwapchainSupport(VkPhysicalDevice device,
