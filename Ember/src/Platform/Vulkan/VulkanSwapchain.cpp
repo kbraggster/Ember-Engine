@@ -10,14 +10,16 @@ VulkanSwapchain::VulkanSwapchain(const VulkanDevice& device, const VkSurfaceKHR&
 
 VulkanSwapchain::~VulkanSwapchain()
 {
+    vkDeviceWaitIdle(m_Device.GetVkDevice());
+
+    Cleanup();
+
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         vkDestroySemaphore(m_Device.GetVkDevice(), m_ImageAvailableSemaphores[i], nullptr);
         vkDestroySemaphore(m_Device.GetVkDevice(), m_RenderFinishedSemaphores[i], nullptr);
         vkDestroyFence(m_Device.GetVkDevice(), m_InFlightFences[i], nullptr);
     }
-
-    Cleanup();
 }
 
 void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
@@ -31,10 +33,8 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
     VkExtent2D extent                = ChooseSwapExtent(details.Capabilities, width, height);
 
     uint32_t imageCount = details.Capabilities.minImageCount + 1;
-    if (details.Capabilities.maxImageCount > 0 && imageCount > details.Capabilities.maxImageCount)
-    {
-        imageCount = details.Capabilities.maxImageCount;
-    }
+    if (details.Capabilities.maxImageCount > 0)
+        imageCount = std::min(imageCount, details.Capabilities.maxImageCount);
 
     // Create the swapchain
     VkSwapchainCreateInfoKHR createInfo{};
@@ -50,8 +50,8 @@ void VulkanSwapchain::CreateSwapchain(uint32_t width, uint32_t height)
     const QueueFamilyIndices& indices = m_Device.GetQueueFamilyIndices();
     uint32_t queueFamilyIndices[]     = {indices.GraphicsFamily, indices.PresentFamily};
     createInfo.imageSharingMode       = VK_SHARING_MODE_EXCLUSIVE;
-    createInfo.queueFamilyIndexCount  = 0;
-    createInfo.pQueueFamilyIndices    = nullptr;
+    createInfo.queueFamilyIndexCount  = 2;
+    createInfo.pQueueFamilyIndices    = queueFamilyIndices;
     createInfo.preTransform           = details.Capabilities.currentTransform;
     createInfo.compositeAlpha         = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     createInfo.presentMode            = presentMode;
@@ -137,7 +137,7 @@ uint32_t VulkanSwapchain::AcquireNextImage()
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
         EM_CORE_ASSERT(false, "Failed to acquire swapchain image!");
 
-    EM_CORE_ASSERT(imageIndex < MAX_FRAMES_IN_FLIGHT, "Frame index out of bounds");
+    EM_CORE_ASSERT(imageIndex < m_SwapchainImages.size(), "Frame index out of bounds");
 
     m_CurrentFrame = (m_CurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
@@ -146,13 +146,18 @@ uint32_t VulkanSwapchain::AcquireNextImage()
 
 void VulkanSwapchain::Cleanup()
 {
-    for (auto imageView : m_SwapchainImageViews)
-        vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
+    vkDeviceWaitIdle(m_Device.GetVkDevice());
 
-    m_SwapchainImageViews.clear();
+    if (m_Swapchain != VK_NULL_HANDLE)
+    {
+        for (auto imageView : m_SwapchainImageViews)
+            vkDestroyImageView(m_Device.GetVkDevice(), imageView, nullptr);
 
-    vkDestroySwapchainKHR(m_Device.GetVkDevice(), m_Swapchain, nullptr);
-    m_Swapchain = VK_NULL_HANDLE;
+        m_SwapchainImageViews.clear();
+
+        vkDestroySwapchainKHR(m_Device.GetVkDevice(), m_Swapchain, nullptr);
+        m_Swapchain = VK_NULL_HANDLE;
+    }
 }
 
 VulkanSwapchain::SwapchainSupportDetails VulkanSwapchain::QuerySwapchainSupport(VkPhysicalDevice device,

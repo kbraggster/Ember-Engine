@@ -17,10 +17,12 @@ VulkanContext::VulkanContext()
 
 VulkanContext::~VulkanContext()
 {
+    vkDeviceWaitIdle(m_Device->GetVkDevice());
+
     if (!m_CommandBuffers.empty())
     {
-        vkFreeCommandBuffers(m_Device->GetVkDevice(), m_Device->GetVkCommandPool(), (uint32_t)m_CommandBuffers.size(),
-                             m_CommandBuffers.data());
+        vkFreeCommandBuffers(m_Device->GetVkDevice(), m_Device->GetVkCommandPool(),
+                             static_cast<uint32_t>(m_CommandBuffers.size()), m_CommandBuffers.data());
         m_CommandBuffers.clear();
         EM_CORE_INFO("Command buffers destroyed");
     }
@@ -28,14 +30,19 @@ VulkanContext::~VulkanContext()
     if (!m_Framebuffers.empty())
     {
         for (auto framebuffer : m_Framebuffers)
-            vkDestroyFramebuffer(m_Device->GetVkDevice(), framebuffer, nullptr);
-
+        {
+            if (framebuffer != VK_NULL_HANDLE)
+                vkDestroyFramebuffer(m_Device->GetVkDevice(), framebuffer, nullptr);
+        }
         m_Framebuffers.clear();
         EM_CORE_INFO("Framebuffers destroyed");
     }
 
     vkDestroyDescriptorPool(m_Device->GetVkDevice(), m_DescriptorPool, nullptr);
+    m_DescriptorPool = VK_NULL_HANDLE;
+
     vkDestroyRenderPass(m_Device->GetVkDevice(), m_RenderPass, nullptr);
+    m_RenderPass = VK_NULL_HANDLE;
 
     m_Swapchain.reset();
     m_Device.reset();
@@ -286,7 +293,6 @@ void VulkanContext::CreateFramebuffers()
 
 void VulkanContext::RecreateSwapchain()
 {
-    // Wait for device to finish all operations
     vkDeviceWaitIdle(m_Device->GetVkDevice());
 
     // Clean up framebuffers
@@ -296,7 +302,6 @@ void VulkanContext::RecreateSwapchain()
     }
     m_Framebuffers.clear();
 
-    // Destroy existing swapchain
     m_Swapchain->Cleanup();
 
     // Recreate the swapchain
@@ -310,7 +315,6 @@ void VulkanContext::RecreateSwapchain()
 
     m_Swapchain->CreateSwapchain(width, height);
 
-    // Recreate framebuffers for the new swapchain
     CreateFramebuffers();
 
     EM_CORE_INFO("Swapchain recreated successfully");

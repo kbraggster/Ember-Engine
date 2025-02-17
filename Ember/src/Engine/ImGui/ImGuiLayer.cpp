@@ -90,6 +90,7 @@ void ImGuiLayer::End()
     uint32_t currentFrameIndex = m_Context->GetSwapchain()->AcquireNextImage();
 
     VkCommandBuffer commandBuffer = m_Context->GetCommandBuffer(currentFrameIndex);
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass        = m_Context->GetRenderPass();
